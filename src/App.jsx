@@ -63,6 +63,9 @@ function App() {
     const saved = localStorage.getItem("viewedQs");
     return saved ? JSON.parse(saved) : {};
   });
+  const [deleteRowFrom, setDeleteRowFrom] = useState("");
+  const [deleteRowTo, setDeleteRowTo] = useState("");
+  const [showDeleteByRowsModal, setShowDeleteByRowsModal] = useState(false);
   const [goToTableNumber, setGoToTableNumber] = useState("");
 
   const tableRefs = useRef([]);
@@ -210,7 +213,7 @@ function App() {
 
   useEffect(() => {
     if (isDataLoaded) generateAllTables();
-  }, [dateValues, aValues, bValues, purpleRangeFrom, purpleRangeTo, isDataLoaded]);
+  }, [dateValues, aValues, bValues, purpleRangeFrom, purpleRangeTo, isDataLoaded, deletedRows]);
 
   useEffect(() => {
     if (isDataLoaded && allTableData.length > 0) {
@@ -1103,6 +1106,13 @@ function App() {
       }
       setShowDeleteModal(false);
       setShowDeleteByDatesModal(true);
+    } else if (deleteOption === "rows") {
+      if (!deleteRowFrom || !deleteRowTo) {
+        alert("⚠️ Vui lòng nhập đầy đủ STT dòng!");
+        return;
+      }
+      setShowDeleteModal(false);
+      setShowDeleteByRowsModal(true);
     }
   };
 
@@ -1216,6 +1226,95 @@ function App() {
       setDeleteOption("all");
       setDeleteDateFrom("");
       setDeleteDateTo("");
+    } catch (error) {
+      alert("⚠️ Lỗi: " + error.message);
+    }
+  };
+
+  const confirmDeleteByRows = async () => {
+    try {
+      const from = parseInt(deleteRowFrom);
+      const to = parseInt(deleteRowTo);
+
+      if (isNaN(from) || isNaN(to) || from <= 0 || to <= 0 || from > to) {
+        alert("⚠️ STT dòng không hợp lệ!");
+        return;
+      }
+
+      // Mapping STT hiển thị (visible) sang index thực tế
+      const visibleIndices = [];
+      for (let i = 0; i < ROWS; i++) {
+        if (!deletedRows[i]) {
+          visibleIndices.push(i);
+        }
+      }
+
+      if (from > visibleIndices.length) {
+        alert("⚠️ STT bắt đầu vượt quá số lượng dòng hiện có!");
+        return;
+      }
+
+      const newDeletedRows = [...deletedRows];
+      let deletedCount = 0;
+
+      // Xóa các dòng dựa trên STT hiển thị
+      for (let vIdx = from - 1; vIdx <= Math.min(to - 1, visibleIndices.length - 1); vIdx++) {
+        const actualIndex = visibleIndices[vIdx];
+        newDeletedRows[actualIndex] = true;
+        deletedCount++;
+      }
+
+      setDeletedRows(newDeletedRows);
+
+      // Lưu Q hiện tại
+      setSaveStatus("💾 Đang lưu...");
+      const result = await savePageData(
+        pageId,
+        aValues,
+        bValues,
+        zValues,
+        dateValues,
+        newDeletedRows,
+        purpleRangeFrom,
+        purpleRangeTo,
+        keepLastNRows,
+      );
+
+      // Sync deletedRows sang Q1-Q10
+      for (let i = 1; i <= 10; i++) {
+        const qId = `q${i}`;
+        if (qId !== pageId) {
+          const qResult = await loadPageData(qId);
+          if (qResult.success && qResult.data) {
+            await savePageData(
+              qId,
+              qResult.data.aValues,
+              qResult.data.bValues,
+              qResult.data.zValues || Array(ROWS).fill(""),
+              dateValues,
+              newDeletedRows,
+              purpleRangeFrom,
+              purpleRangeTo,
+              keepLastNRows,
+            );
+          }
+        }
+      }
+
+      if (result.success) {
+        setSaveStatus("✅ Đã lưu dữ liệu thành công");
+        alert(`✅ Đã xóa ${deletedCount} dòng từ STT ${from} đến ${to} (đồng bộ Q1-Q10)!`);
+      } else {
+        setSaveStatus("⚠️ Lỗi: " + result.error);
+      }
+
+      setTimeout(() => setSaveStatus(""), 2000);
+      setShowDeleteByRowsModal(false);
+
+      // Reset form
+      setDeleteOption("all");
+      setDeleteRowFrom("");
+      setDeleteRowTo("");
     } catch (error) {
       alert("⚠️ Lỗi: " + error.message);
     }
@@ -1966,7 +2065,7 @@ function App() {
                   Xóa dòng mới nhất
                 </label>
 
-                {/* <label
+                <label
                   style={{
                     fontSize: "35px",
                     marginBottom: "16px",
@@ -1983,13 +2082,14 @@ function App() {
                     style={{ width: "20px", height: "20px", cursor: "pointer" }}
                   />
                   Xóa theo khoảng ngày
-                </label> */}
+                </label>
 
                 {deleteOption === "dates" && (
                   <div
                     className="input-row"
                     style={{
                       marginTop: "16px",
+                      marginBottom: "16px",
                       display: "flex",
                       alignItems: "center",
                       gap: "12px",
@@ -2014,6 +2114,68 @@ function App() {
                       type="date"
                       value={deleteDateTo}
                       onChange={(e) => setDeleteDateTo(e.target.value)}
+                      style={{
+                        padding: "12px",
+                        fontSize: "18px",
+                        border: "2px solid #ddd",
+                        borderRadius: "6px",
+                        flex: 1,
+                      }}
+                    />
+                  </div>
+                )}
+
+                <label
+                  style={{
+                    fontSize: "35px",
+                    marginBottom: "16px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <input
+                    type="radio"
+                    value="rows"
+                    checked={deleteOption === "rows"}
+                    onChange={(e) => setDeleteOption(e.target.value)}
+                    style={{ width: "20px", height: "20px", cursor: "pointer" }}
+                  />
+                  Xóa theo khoảng STT dòng
+                </label>
+
+                {deleteOption === "rows" && (
+                  <div
+                    className="input-row"
+                    style={{
+                      marginTop: "16px",
+                      marginBottom: "16px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                    }}
+                  >
+                    <input
+                      type="number"
+                      placeholder="STT từ"
+                      value={deleteRowFrom}
+                      onChange={(e) => setDeleteRowFrom(e.target.value)}
+                      style={{
+                        padding: "12px",
+                        fontSize: "18px",
+                        border: "2px solid #ddd",
+                        borderRadius: "6px",
+                        flex: 1,
+                      }}
+                    />
+                    <span style={{ fontSize: "18px", fontWeight: "bold" }}>
+                      đến
+                    </span>
+                    <input
+                      type="number"
+                      placeholder="STT đến"
+                      value={deleteRowTo}
+                      onChange={(e) => setDeleteRowTo(e.target.value)}
                       style={{
                         padding: "12px",
                         fontSize: "18px",
@@ -2395,6 +2557,54 @@ function App() {
               <button
                 className="btn-delete"
                 onClick={confirmDeleteByDates}
+                style={{ fontSize: "18px", padding: "12px 24px" }}
+              >
+                Xác nhận xóa
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete By Rows Confirmation Modal */}
+      {showDeleteByRowsModal && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: "500px" }}>
+            <div className="modal-header">
+              <h3 style={{ fontSize: "24px" }}>⚠️ Xác nhận xóa theo dòng</h3>
+            </div>
+
+            <div className="modal-body">
+              <p
+                style={{
+                  fontSize: "18px",
+                  textAlign: "center",
+                  margin: "20px 0",
+                }}
+              >
+                Bạn có chắc chắn muốn xóa các dòng từ STT:
+                <br />
+                <br />
+                <strong style={{ fontSize: "20px", color: "#dc3545" }}>
+                  {deleteRowFrom} đến {deleteRowTo}
+                </strong>
+                <br />
+                <br />
+                Dữ liệu sẽ được đồng bộ xóa trên tất cả Q1-Q10!
+              </p>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-cancel"
+                onClick={() => setShowDeleteByRowsModal(false)}
+                style={{ fontSize: "18px", padding: "12px 24px" }}
+              >
+                Hủy
+              </button>
+              <button
+                className="btn-delete"
+                onClick={confirmDeleteByRows}
                 style={{ fontSize: "18px", padding: "12px 24px" }}
               >
                 Xác nhận xóa

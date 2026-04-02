@@ -336,60 +336,6 @@ function InputPage() {
     setTimeout(() => setSaveStatus(""), 2000);
   };
 
-  // Save data vào master_draft
-  const handleClearDraft = async () => {
-    if (
-      !window.confirm(
-        "⚠️ CẢNH BÁO: Bạn có chắc chắn muốn xóa TOÀN BỘ dữ liệu nháp này không?\n\nHành động này không thể hoàn tác!",
-      )
-    ) {
-      return;
-    }
-
-    try {
-      const emptyArray = Array(MIN_ROWS).fill("");
-      const emptyDeleted = Array(MIN_ROWS).fill(false);
-
-      setDateValues(emptyArray);
-      setZValues(emptyArray);
-      setDeletedRows(emptyDeleted);
-      setAllQData(
-        Array(10)
-          .fill(null)
-          .map(() => ({ aValues: [...emptyArray], bValues: [...emptyArray] })),
-      );
-      setSelectedRows({});
-
-      setSaveStatus("🗑️ Đang xóa...");
-      const result = await savePageData(
-        "master_draft",
-        null,
-        null,
-        emptyArray, // zValues
-        emptyArray, // dateValues
-        emptyDeleted,
-        purpleRangeFrom,
-        purpleRangeTo,
-        keepLastNRows,
-        Array(10)
-          .fill(null)
-          .map(() => ({
-            aValues: Array(MIN_ROWS).fill(""),
-            bValues: Array(MIN_ROWS).fill(""),
-          })),
-      );
-
-      if (result.success) {
-        setSaveStatus("✅ Đã xóa sạch dữ liệu nháp");
-      } else {
-        setSaveStatus("⚠️ Lỗi khi xóa: " + result.error);
-      }
-    } catch (e) {
-      setSaveStatus("⚠️ Lỗi khi xóa");
-    }
-    setTimeout(() => setSaveStatus(""), 2000);
-  };
-
   const handleSave = async () => {
     setSaveStatus("💾 Đang lưu...");
     const result = await savePageData(
@@ -494,7 +440,7 @@ function InputPage() {
     }
 
     setIsAddingToCalc(true);
-    setSaveStatus("🚀 Đang thêm vào bảng tính...");
+    setSaveStatus("🚀 Đang thêm dòng vào bảng tính...");
 
     try {
       for (let i = 1; i <= 10; i++) {
@@ -781,19 +727,7 @@ function InputPage() {
                   border: "none",
                 }}
               >
-                ➕ Thêm vào bảng tính
-              </button>
-              <button
-                className="toolbar-btn delete-btn"
-                onClick={handleClearDraft}
-                style={{
-                  fontSize: "20px",
-                  backgroundColor: "#dc3545",
-                  color: "white",
-                  border: "none",
-                }}
-              >
-                🗑️ Xóa dữ liệu Bảng thông
+                ➕ Kích chọn số dòng thông
               </button>
               {saveStatus && (
                 <span style={{ color: "#28a745" }}>{saveStatus}</span>
