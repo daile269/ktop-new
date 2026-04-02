@@ -318,7 +318,8 @@ body {
   color: #666;
   text-align: center;
   font-size: 30px;
-  min-width: 120px; /* Tăng lên 120px để chứa đủ giá trị 3 chữ số như '3-100' */
+  width: 120px; /* Width cố định cho các cột 0-9 */
+  min-width: 120px;
   position: sticky;
   top: 41px; /* Offset để nằm dưới group-header */
   z-index: 9;
@@ -326,7 +327,8 @@ body {
 
 .col-header.fixed {
   background: #f0f0f0 !important;
-  min-width: 60px;
+  width: 80px; /* Width cố định cho STT, A, B, T */
+  min-width: 80px;
   font-size: 30px;
 }
 
@@ -356,6 +358,7 @@ body {
 }
 
 .data-cell.date-col {
+  width: 300px !important; /* Width cố định cho Ngày */
   min-width: 300px !important;
   max-width: 350px !important;
   text-align: left;
@@ -574,9 +577,12 @@ body {
 }
 
 .table-section {
-  flex: 0 0 auto; /* Không co lại */
-  min-width: 1500px; /* Width tối thiểu để giữ nguyên chiều rộng */
-  width: 1500px; /* Width cố định */
+  flex: 0 0 auto;
+  width: 1680px; /* Width cho các bảng T2-T10 */
+}
+
+.table-section.first-table {
+  width: 1840px; /* Width cho bảng T1 (có thêm A, B = 160px) */
 }
 
 .table-title {

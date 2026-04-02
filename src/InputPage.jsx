@@ -10,11 +10,9 @@ const TaskRow = memo(
     isDeleted,
     isSelected,
     zValue,
-    dateValue,
     allQData,
     onToggleSelect,
     onZChange,
-    onDateChange,
     onAChange,
     onBChange,
   }) => {
@@ -59,15 +57,7 @@ const TaskRow = memo(
             }}
           />
         </td>
-        <td>
-          <input
-            type="date"
-            className="cell-input"
-            value={isDeleted ? "" : dateValue || ""}
-            onChange={(e) => onDateChange(rowIndex, e.target.value)}
-            disabled={isDeleted}
-          />
-        </td>
+        {/* Ngày đã bị loại bỏ */}
         {Array.from({ length: 10 }).map((_, qIndex) => {
           const qData = allQData[qIndex];
           const aV = isDeleted ? "" : qData?.aValues[rowIndex] || "";
@@ -137,6 +127,9 @@ function InputPage() {
   const [selectedRows, setSelectedRows] = useState({}); // { rowIndex: true }
   const [showAddModal, setShowAddModal] = useState(false);
   const [isAddingToCalc, setIsAddingToCalc] = useState(false);
+  const [transferDate, setTransferDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
 
   // Load data từ master_draft
   useEffect(() => {
@@ -230,7 +223,7 @@ function InputPage() {
           }
 
           // Scroll đến dòng này (+2 vì có 2 header rows)
-          const targetRowNumber = displayRowNumber + 2;
+          const displayRowNumberLocal = displayRowNumber; // local copy
           const rowElement = document.querySelector(
             `tbody tr:nth-child(${displayRowNumber - 1})`, // +1 để scroll xuống thêm 1 dòng
           );
@@ -362,17 +355,8 @@ function InputPage() {
   };
 
   // Helper function to format date to DD/MM/YYYY
-  const formatDateSimple = (dateString) => {
-    if (!dateString) return "N/A";
-    const parts = dateString.split("-");
-    if (parts.length === 3) {
-      const year = parts[0];
-      const month = parts[1];
-      const day = parts[2];
-      return `${day}/${month}/${year}`;
-    }
-    return dateString;
-  };
+  // formatDateSimple removed
+
 
   const handleToggleSelect = useCallback((rowIndex) => {
     setSelectedRows((prev) => {
@@ -394,13 +378,8 @@ function InputPage() {
     }
   }, []);
 
-  const handleDateChange = useCallback((rIdx, val) => {
-    setDateValues((prev) => {
-      const next = [...prev];
-      next[rIdx] = val;
-      return next;
-    });
-  }, []);
+  // Date change has been removed
+
 
   const handleAChange = useCallback((qIdx, rIdx, val) => {
     setAllQData((prev) => {
@@ -471,7 +450,7 @@ function InputPage() {
           activeA.push(allQData[i - 1].aValues[idx]);
           activeB.push(allQData[i - 1].bValues[idx]);
           activeZ.push(zValues[idx]);
-          activeD.push(dateValues[idx]);
+          activeD.push(transferDate);
           activeDel.push(false);
         });
 
@@ -510,7 +489,7 @@ function InputPage() {
       alert(`✅ Đã thêm ${selectedIndices.length} dòng thành công!`);
       setSelectedRows({});
       setShowAddModal(false);
-    } catch (e) {
+    } catch (err) {
       alert("⚠️ Lỗi trong quá trình thêm!");
     } finally {
       setIsAddingToCalc(false);
@@ -776,9 +755,7 @@ function InputPage() {
                   <th rowSpan="2" style={{ minWidth: "140px", width: "140px" }}>
                     Z
                   </th>
-                  <th rowSpan="2" style={{ width: "200px" }}>
-                    Ngày
-                  </th>
+                  {/* Ngày đã bị loại bỏ */}
                   {Array.from({ length: 10 }, (_, qIndex) => {
                     // Màu background: Q lẻ màu ghi nhạt, Q chẵn màu xanh nhạt
                     const color = qIndex % 2 === 0 ? "#e0e0e0" : "#e3f2fd"; // Q lẻ (index 0,2,4,6,8) = ghi, Q chẵn (index 1,3,5,7,9) = xanh
@@ -840,11 +817,9 @@ function InputPage() {
                     isDeleted={deletedRows[rowIndex]}
                     isSelected={!!selectedRows[rowIndex]}
                     zValue={zValues[rowIndex]}
-                    dateValue={dateValues[rowIndex]}
                     allQData={allQData}
                     onToggleSelect={handleToggleSelect}
                     onZChange={handleZChange}
-                    onDateChange={handleDateChange}
                     onAChange={handleAChange}
                     onBChange={handleBChange}
                   />
@@ -867,7 +842,7 @@ function InputPage() {
 
             <div
               style={{
-                maxHeight: "300px",
+                maxHeight: "200px",
                 overflowY: "auto",
                 border: "1px solid #ddd",
                 padding: "10px",
@@ -882,15 +857,46 @@ function InputPage() {
                     key={idx}
                     style={{ padding: "5px", borderBottom: "1px solid #eee" }}
                   >
-                    Dòng {parseInt(idx) + 1} - Ngày:{" "}
-                    <strong>{formatDateSimple(dateValues[idx])}</strong> - Thông
-                    số Z: <strong>{zValues[idx] || "N/A"}</strong>
+                    Dòng {parseInt(idx) + 1} - Thông số Z:{" "}
+                    <strong>{zValues[idx] || "N/A"}</strong>
                   </li>
                 ))}
                 {Object.keys(selectedRows).length === 0 && (
                   <li style={{ color: "red" }}>Chưa chọn dòng nào!</li>
                 )}
               </ul>
+            </div>
+
+            <div
+              style={{
+                marginBottom: "20px",
+                padding: "15px",
+                background: "#f0f0f0",
+                borderRadius: "8px",
+              }}
+            >
+              <label
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  display: "block",
+                  marginBottom: "10px",
+                }}
+              >
+                📅 Chọn ngày để lưu vào bảng tính:
+              </label>
+              <input
+                type="date"
+                value={transferDate}
+                onChange={(e) => setTransferDate(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  fontSize: "20px",
+                  borderRadius: "4px",
+                  border: "1px solid #ccc",
+                }}
+              />
             </div>
 
             <div

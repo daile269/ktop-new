@@ -158,7 +158,13 @@ function App() {
     for (let col = 0; col < 10; col++) {
       let y = 1;
       for (let row = 0; row < actualRows; row++) {
-        const tVal = tValues[row] ? parseInt(tValues[row]) : -1;
+        // Bỏ qua hàng rỗng hoàn toàn để không làm tăng y (skip count)
+        if (tValues[row] === "" && !dateValues[row]) {
+          table[row][col] = { value: "", color: "white" };
+          continue;
+        }
+
+        const tVal = tValues[row] !== "" ? parseInt(tValues[row]) : -1;
         const isRed = col === tVal && tVal !== -1;
         const isPurple = y >= purpleRangeFrom && y <= purpleRangeTo;
         let color = "white";
@@ -200,6 +206,11 @@ function App() {
         v2 = newTValuesArr[i - 1];
       }
       for (let r = 0; r < actualRows; r++) {
+        // Chỉ tính toán nếu hàng có dữ liệu (có A hoặc B)
+        if (v1[r] === "" && v2[r] === "" && !dateValues[r]) {
+          newTValuesArr[i][r] = "";
+          continue;
+        }
         const n1 = parseInt(v1[r]) || 0;
         const n2 = parseInt(v2[r]) || 0;
         newTValuesArr[i][r] = String((n1 + n2) % 10);
@@ -438,10 +449,16 @@ function App() {
 
       // Duyệt qua từng hàng trong cột (trên xuống dưới)
       for (let row = 0; row < actualRows; row++) {
+        // Bỏ qua hàng rỗng để không ảnh hưởng đến y (Logic đếm ban đầu)
+        if (tValues[row] === "" && !dateValues[row]) {
+           table[row][col] = { value: "", color: "white" };
+           continue;
+        }
+
         let currentY = y;
 
         // Lấy giá trị T của hàng này
-        const tColumnForThisRow = tValues[row] ? parseInt(tValues[row]) : -1;
+        const tColumnForThisRow = tValues[row] !== "" ? parseInt(tValues[row]) : -1;
 
         // Xác định màu
         let color = "white";
@@ -1783,7 +1800,10 @@ function App() {
 
         <div className="tables-container">
           {allTableData.map((tableData, tableIndex) => (
-            <div key={tableIndex} className="table-section">
+            <div
+              key={tableIndex}
+              className={`table-section ${tableIndex === 0 ? "first-table" : ""}`}
+            >
               <div
                 className="data-grid-wrapper"
                 ref={(el) => (tableRefs.current[tableIndex] = el)}
@@ -1796,12 +1816,16 @@ function App() {
                         <th colSpan="3" className="group-header">
                           Q{pageId.replace("q", "")}
                         </th>
-                        <th colSpan="1" className="group-header">
-                          A
-                        </th>
-                        <th colSpan="1" className="group-header">
-                          B
-                        </th>
+                        {tableIndex === 0 && (
+                          <>
+                            <th colSpan="1" className="group-header">
+                              A
+                            </th>
+                            <th colSpan="1" className="group-header">
+                              B
+                            </th>
+                          </>
+                        )}
                         <th colSpan="1" className="group-header">
                           Thông
                         </th>
@@ -1815,8 +1839,12 @@ function App() {
                         <th className="col-header fixed" colSpan="2" style={{ minWidth: "300px", width: "300px" }}>
                           Ngày
                         </th>
-                        <th className="col-header fixed">A</th>
-                        <th className="col-header fixed">B</th>
+                        {tableIndex === 0 && (
+                          <>
+                            <th className="col-header fixed">A</th>
+                            <th className="col-header fixed">B</th>
+                          </>
+                        )}
                         <th className="col-header fixed">T{tableIndex + 1}</th>
                         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                           <th key={num} className="col-header">
@@ -1884,56 +1912,60 @@ function App() {
                                   }}
                                 />
                               </td>
-                              <td
-                                className={`data-cell fixed value-col ${
-                                  highlightedACells[rowIndex]
-                                    ? "highlighted-t-cell"
-                                    : ""
-                                }`}
-                                onClick={() => handleACellClick(rowIndex)}
-                              >
-                                <input
-                                  type="text"
-                                  className="grid-input"
-                                  value={aValues[rowIndex] || ""}
-                                  readOnly={true}
-                                  style={{
-                                    width: "100%",
-                                    border: "none",
-                                    background: "transparent",
-                                    fontSize: "35px",
-                                    textAlign: "center",
-                                    color: highlightedACells[rowIndex] ? "white" : "#ef4444",
-                                    fontWeight: "600",
-                                    pointerEvents: "none"
-                                  }}
-                                />
-                              </td>
-                              <td
-                                className={`data-cell fixed value-col ${
-                                  highlightedBCells[rowIndex]
-                                    ? "highlighted-t-cell"
-                                    : ""
-                                }`}
-                                onClick={() => handleBCellClick(rowIndex)}
-                              >
-                                <input
-                                  type="text"
-                                  className="grid-input"
-                                  value={bValues[rowIndex] || ""}
-                                  readOnly={true}
-                                  style={{
-                                    width: "100%",
-                                    border: "none",
-                                    background: "transparent",
-                                    fontSize: "35px",
-                                    textAlign: "center",
-                                    color: highlightedBCells[rowIndex] ? "white" : "#ef4444",
-                                    fontWeight: "600",
-                                    pointerEvents: "none"
-                                  }}
-                                />
-                              </td>
+                              {tableIndex === 0 && (
+                                <>
+                                  <td
+                                    className={`data-cell fixed value-col ${
+                                      highlightedACells[rowIndex]
+                                        ? "highlighted-t-cell"
+                                        : ""
+                                    }`}
+                                    onClick={() => handleACellClick(rowIndex)}
+                                  >
+                                    <input
+                                      type="text"
+                                      className="grid-input"
+                                      value={aValues[rowIndex] || ""}
+                                      readOnly={true}
+                                      style={{
+                                        width: "100%",
+                                        border: "none",
+                                        background: "transparent",
+                                        fontSize: "35px",
+                                        textAlign: "center",
+                                        color: highlightedACells[rowIndex] ? "white" : "#ef4444",
+                                        fontWeight: "600",
+                                        pointerEvents: "none"
+                                      }}
+                                    />
+                                  </td>
+                                  <td
+                                    className={`data-cell fixed value-col ${
+                                      highlightedBCells[rowIndex]
+                                        ? "highlighted-t-cell"
+                                        : ""
+                                    }`}
+                                    onClick={() => handleBCellClick(rowIndex)}
+                                  >
+                                    <input
+                                      type="text"
+                                      className="grid-input"
+                                      value={bValues[rowIndex] || ""}
+                                      readOnly={true}
+                                      style={{
+                                        width: "100%",
+                                        border: "none",
+                                        background: "transparent",
+                                        fontSize: "35px",
+                                        textAlign: "center",
+                                        color: highlightedBCells[rowIndex] ? "white" : "#ef4444",
+                                        fontWeight: "600",
+                                        pointerEvents: "none"
+                                      }}
+                                    />
+                                  </td>
+                                </>
+                              )}
                               <td
                                 className={`data-cell fixed value-col ${
                                   highlightedTCells[tableIndex]?.[rowIndex]
