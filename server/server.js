@@ -7,10 +7,12 @@ import Page from "./models/Page.js";
 // Load environment variables
 dotenv.config();
 
+console.log("🚀 [SERVER ENV] Port:", process.env.PORT);
+console.log("🚀 [SERVER ENV] MongoDB URI:", process.env.MONGODB_URI);
+
 const app = express();
-const PORT = process.env.PORT || 5010;
-const MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/ktop-new";
+const PORT = process.env.PORT;
+const MONGODB_URI = process.env.MONGODB_URI;
 
 // Middleware
 app.use(cors());

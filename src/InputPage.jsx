@@ -539,8 +539,28 @@ function InputPage() {
             fontStyle: "italic",
             margin: "0",
             color: "#cf3535ff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "15px"
           }}
         >
+          {/* Nhãn phân biệt Web */}
+          {import.meta.env.VITE_SITE_ID && (
+            <span
+              style={{
+                fontSize: "16px",
+                padding: "4px 12px",
+                borderRadius: "20px",
+                backgroundColor: import.meta.env.VITE_SITE_ID === "site_a" ? "#007bff" : "#6c757d",
+                color: "white",
+                fontStyle: "normal",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+              }}
+            >
+              Vùng: {import.meta.env.VITE_SITE_ID === "site_a" ? "A" : "B"}
+            </span>
+          )}
           Dự án cải tạo môi trường thềm lục địa biển Việt Nam -
           <span
             style={{

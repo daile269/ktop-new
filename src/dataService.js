@@ -1,5 +1,21 @@
 // API Configuration
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5010";
+const SITE_ID = import.meta.env.VITE_SITE_ID || "";
+
+/**
+ * Hàm bổ trợ để lấy ID thực tế trong DB dựa trên Site ID
+ * @param {string} pageId - ID gốc truyền vào (vd: 'q1', 'master_draft')
+ */
+const getRealPageId = (pageId) => {
+  // Những trang liệt kê ở đây sẽ DÙNG CHUNG cho tất cả các web clone
+  const sharedPages = ["master_draft"];
+
+  if (sharedPages.includes(pageId) || !SITE_ID) {
+    return pageId; // Trả về nguyên bản
+  }
+  // Thêm tiền tố để tách biệt dữ liệu bảng tính
+  return `${SITE_ID}_${pageId}`;
+};
 
 /**
  * Lưu dữ liệu trang lên MongoDB qua Backend API
@@ -25,7 +41,9 @@ export const savePageData = async (
   allQData = undefined,
 ) => {
   try {
-    const response = await fetch(`${API_URL}/api/pages/${pageId}`, {
+    const realId = getRealPageId(pageId);
+    console.log(`💾 Saving data for REAL ID: ${realId}`);
+    const response = await fetch(`${API_URL}/api/pages/${realId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -62,7 +80,9 @@ export const savePageData = async (
  */
 export const loadPageData = async (pageId) => {
   try {
-    const response = await fetch(`${API_URL}/api/pages/${pageId}`);
+    const realId = getRealPageId(pageId);
+    console.log(`📖 Loading data for REAL ID: ${realId}`);
+    const response = await fetch(`${API_URL}/api/pages/${realId}`);
     const result = await response.json();
 
     if (!response.ok) {
@@ -121,7 +141,8 @@ export const loadPageData = async (pageId) => {
  */
 export const deletePageData = async (pageId) => {
   try {
-    const response = await fetch(`${API_URL}/api/pages/${pageId}`, {
+    const realId = getRealPageId(pageId);
+    const response = await fetch(`${API_URL}/api/pages/${realId}`, {
       method: "DELETE",
     });
 
