@@ -542,25 +542,7 @@ function InputPage() {
             gap: "15px",
           }}
         >
-          {/* Nhãn phân biệt Web */}
-          {import.meta.env.VITE_SITE_ID && (
-            <span
-              style={{
-                fontSize: "16px",
-                padding: "4px 12px",
-                borderRadius: "20px",
-                backgroundColor:
-                  import.meta.env.VITE_SITE_ID === "site_a"
-                    ? "#007bff"
-                    : "#6c757d",
-                color: "white",
-                fontStyle: "normal",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-              }}
-            >
-              Bảng thông - APP: {import.meta.env.VITE_SITE_ID === "site_a" ? "A" : "B"}
-            </span>
-          )}
+          {/* Nhãn phân biệt Web đã chuyển xuống Toolbar */}
           Dự án cải tạo môi trường thềm lục địa biển Việt Nam -
           <span
             style={{
@@ -583,7 +565,7 @@ function InputPage() {
               justifyContent: "center",
               alignItems: "center",
               marginBottom: "20px",
-              marginTop: "20px",
+              marginTop: "40px",
             }}
           >
             {/* <div
@@ -663,6 +645,28 @@ function InputPage() {
                 marginRight: "20px",
               }}
             >
+              <button
+                className="toolbar-btn"
+                disabled
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  backgroundColor:
+                    import.meta.env.VITE_SITE_ID === "site_a"
+                      ? "#007bff"
+                      : "#6c757d",
+                  color: "white",
+                  cursor: "default",
+                  opacity: 1,
+                  border: "none",
+                  padding: "6px 12px",
+                  borderRadius: "8px",
+                  marginRight: "10px",
+                }}
+              >
+                Bảng thông - APP:{" "}
+                {import.meta.env.VITE_SITE_ID === "site_a" ? "A" : "B"}
+              </button>
               <label style={{ fontSize: "20px", fontWeight: "bold" }}>
                 📊 Dòng tồn tại:
               </label>
