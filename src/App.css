@@ -578,11 +578,11 @@ body {
 
 .table-section {
   flex: 0 0 auto;
-  width: 2210px; /* Increased to accommodate 530px Z column */
+  width: 2340px; /* Adjusted to match sum of columns */
 }
 
 .table-section.first-table {
-  width: 2370px; /* Increased to accommodate 530px Z column */
+  width: 2500px; /* Adjusted to match sum of columns (includes A, B) */
 }
 
 .table-title {

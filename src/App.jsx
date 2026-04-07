@@ -1882,7 +1882,7 @@ function App() {
                         <th colSpan="4" className="group-header">
                           Q{pageId.replace("q", "")}
                         </th>
-                        <th colSpan="3" className="group-header">
+                        <th colSpan="1" className="group-header">
                           Thông tin từ Bảng thông
                         </th>
                         {tableIndex === 0 && (

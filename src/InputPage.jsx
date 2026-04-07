@@ -97,6 +97,28 @@ const TaskRow = memo(
             </span>
           );
         })}
+        <td style={{ textAlign: "center", fontSize: "20px" }}>
+          {String(displayRowNumber).padStart(3, "0")}
+        </td>
+        <td
+          style={{
+            textAlign: "center",
+            width: "80px !important",
+            minWidth: "80px !important",
+            padding: 0,
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => onToggleSelect(rowIndex)}
+            disabled={isDeleted}
+            style={{
+              transform: "scale(2.2)",
+              cursor: "pointer",
+            }}
+          />
+        </td>
       </tr>
     );
   },
@@ -127,9 +149,9 @@ function InputPage() {
   const [selectedRows, setSelectedRows] = useState({}); // { rowIndex: true }
   const [showAddModal, setShowAddModal] = useState(false);
   const [isAddingToCalc, setIsAddingToCalc] = useState(false);
-  const [transferDate, setTransferDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
+  const [transferDate, setTransferDate] = useState(() => {
+    return localStorage.getItem("lastTransferDate") || new Date().toISOString().split("T")[0];
+  });
 
   // States for Deletion
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -220,32 +242,39 @@ function InputPage() {
         }
       }
 
-      if (lastDataRowIndex >= 0) {
+      // Nếu không tìm thấy dòng có dữ liệu, mặc định scroll đến dòng 50 (index 49) nếu có
+      let targetRowIndex = lastDataRowIndex;
+      let isDefaultScroll = false;
+      if (targetRowIndex === -1 && dateValues.length >= 50) {
+        targetRowIndex = 49;
+        isDefaultScroll = true;
+      }
+
+      if (targetRowIndex >= 0) {
         // Delay để đảm bảo DOM đã render xong
         setTimeout(() => {
-          // Tính vị trí của dòng này trong bảng đã sort
-          // Đếm số dòng chưa xóa trước dòng này
+          // Tính vị trí hiển thị của dòng này
           let displayRowNumber = 0;
           for (let i = 0; i < dateValues.length; i++) {
             if (!deletedRows[i]) {
               displayRowNumber++;
-              if (i === lastDataRowIndex) break;
+              if (i === targetRowIndex) break;
             }
           }
 
-          // Scroll đến dòng này (+2 vì có 2 header rows)
+          // Scroll đến dòng này
           const rowElement = document.querySelector(
-            `tbody tr:nth-child(${displayRowNumber - 1})`, // +1 để scroll xuống thêm 1 dòng
+            `tbody tr:nth-child(${displayRowNumber})`,
           );
 
           if (rowElement) {
             rowElement.scrollIntoView({ behavior: "smooth", block: "center" });
-          } else {
-            // Fallback: scroll container xuống 80%
+          } else if (isDefaultScroll) {
+            // Fallback: scroll container xuống khoảng giữa
             const tableContainer =
               document.querySelector(".schedule-table")?.parentElement;
             if (tableContainer) {
-              const scrollPosition = tableContainer.scrollHeight * 0.8;
+              const scrollPosition = tableContainer.scrollHeight * 0.4; // Gần dòng 50 của 125 dòng
               tableContainer.scrollTo({
                 top: scrollPosition,
                 behavior: "smooth",
@@ -637,19 +666,37 @@ function InputPage() {
           activeSourceSTT = []; // New array for source row numbers
 
         if (currentData.success && currentData.data) {
-          activeA = currentData.data.aValues || [];
-          activeB = currentData.data.bValues || [];
-          activeZ = currentData.data.zValues || [];
-          activeD = currentData.data.dateValues || [];
-          activeDel = currentData.data.deletedRows || [];
-          activeSourceSTT = currentData.data.sourceSTTValues || [];
+          const d = currentData.data;
+          // Tìm index của dòng cuối cùng có dữ liệu thực sự (không phải padding)
+          let lastDataIdx = -1;
+          for (let j = (d.aValues || []).length - 1; j >= 0; j--) {
+            if (!d.deletedRows?.[j]) {
+              const hasVal = 
+                d.aValues?.[j] !== "" || 
+                d.bValues?.[j] !== "" || 
+                d.zValues?.[j] !== "" || 
+                d.dateValues?.[j] !== "";
+              if (hasVal) {
+                lastDataIdx = j;
+                break;
+              }
+            }
+          }
+
+          // Chỉ giữ lại các dòng đến dòng có dữ liệu cuối cùng (loại bỏ padding ở cuối)
+          activeA = (d.aValues || []).slice(0, lastDataIdx + 1);
+          activeB = (d.bValues || []).slice(0, lastDataIdx + 1);
+          activeZ = (d.zValues || []).slice(0, lastDataIdx + 1);
+          activeD = (d.dateValues || []).slice(0, lastDataIdx + 1);
+          activeDel = (d.deletedRows || []).slice(0, lastDataIdx + 1);
+          activeSourceSTT = (d.sourceSTTValues || []).slice(0, lastDataIdx + 1);
         } else {
-          activeA = Array(125).fill("");
-          activeB = Array(125).fill("");
-          activeZ = Array(125).fill("");
-          activeD = Array(125).fill("");
-          activeDel = Array(125).fill(true);
-          activeSourceSTT = Array(125).fill("");
+          activeA = [];
+          activeB = [];
+          activeZ = [];
+          activeD = [];
+          activeDel = [];
+          activeSourceSTT = [];
         }
 
         // Append selected rows
@@ -1026,6 +1073,20 @@ function InputPage() {
                       </th>
                     );
                   })}
+                  <th rowSpan="2" style={{ padding: "8px 4px" }}>
+                    STT
+                  </th>
+                  <th
+                    rowSpan="2"
+                    style={{
+                      padding: 0,
+                      width: "80px !important",
+                      minWidth: "80px !important",
+                      fontSize: "22px",
+                    }}
+                  >
+                    Chọn
+                  </th>
                 </tr>
                 <tr>
                   {Array.from({ length: 10 }, (_, qIndex) => {
@@ -1139,7 +1200,11 @@ function InputPage() {
               <input
                 type="date"
                 value={transferDate}
-                onChange={(e) => setTransferDate(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setTransferDate(val);
+                  localStorage.setItem("lastTransferDate", val);
+                }}
                 style={{
                   width: "100%",
                   padding: "10px",
