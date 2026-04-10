@@ -432,6 +432,38 @@ function App() {
 
   // Duplicated effects removed, moved to top.
 
+  // Helper để lấy dòng tương lai (dòng gợi ý tiếp theo)
+  const getFutureRow = (tableData) => {
+    if (!tableData || tableData.length === 0)
+      return Array(10).fill({ value: "", color: "white" });
+
+    const futureRow = [];
+    for (let col = 0; col < 10; col++) {
+      let lastCell = null;
+      for (let row = tableData.length - 1; row >= 0; row--) {
+        if (tableData[row][col] && tableData[row][col].value !== "") {
+          lastCell = tableData[row][col];
+          break;
+        }
+      }
+
+      let nextY;
+      if (!lastCell) {
+        nextY = 1;
+      } else {
+        const parts = lastCell.value.split("-");
+        const lastY = parseInt(parts[1]) || 0;
+        const isRed = lastCell.color && lastCell.color.includes("red");
+        nextY = isRed ? 1 : lastY + 1;
+      }
+
+      const isPurple = nextY >= purpleRangeFrom && nextY <= purpleRangeTo;
+      const color = isPurple ? "purple" : "white";
+      futureRow.push({ value: `${col}-${nextY}`, color: color });
+    }
+    return futureRow;
+  };
+
   // Thuật toán sinh bảng (dùng chung cho cả 2 toa)
   const generateTableData = (tValues, toaName, skipColor = false) => {
     const COLS = 10;
@@ -1739,7 +1771,7 @@ function App() {
                 borderRadius: "8px",
               }}
             >
-              📥 Về Bảng thông
+              📥 Về Bảng thông để chọn dòng thông
             </button>
           </div>
 
@@ -1946,8 +1978,9 @@ function App() {
                           Thông
                         </th>
                         <th colSpan="10" className="group-header">
-                          Q{pageId.replace("q", "")}- Tham số: áp suất nước-nhiệt
-                          độ- độ ph- tỷ phần sinh hóa- mùa- f sinh học
+                          Q{pageId.replace("q", "")}- Tham số: áp suất
+                          nước-nhiệt độ- độ ph- tỷ phần sinh hóa- mùa- f sinh
+                          học
                         </th>
                       </tr>
                       <tr>
@@ -2218,6 +2251,102 @@ function App() {
                           );
                         });
                       })()}
+
+                        {/* Dòng tương lai (Dòng gợi ý) */}
+                        {tableData.length > 0 && (
+                          <tr className="future-row">
+                            <td
+                              className="data-cell fixed future-cell"
+                              style={{
+                                opacity: 0.5,
+                                fontStyle: "italic",
+                                height: "50px",
+                                fontWeight: "300",
+                              }}
+                            >
+                              &nbsp;
+                            </td>
+                            <td
+                              className="data-cell fixed future-cell"
+                              style={{
+                                opacity: 0.5,
+                                fontStyle: "italic",
+                                fontWeight: "300",
+                              }}
+                            >
+                              &nbsp;
+                            </td>
+                            <td
+                              className="data-cell fixed future-cell"
+                              style={{
+                                opacity: 0.5,
+                                fontStyle: "italic",
+                                fontWeight: "300",
+                              }}
+                            >
+                              &nbsp;
+                            </td>
+                            <td
+                              className="data-cell fixed future-cell"
+                              style={{
+                                opacity: 0.5,
+                                fontStyle: "italic",
+                                fontWeight: "300",
+                              }}
+                            >
+                              &nbsp;
+                            </td>
+                            {tableIndex === 0 && (
+                              <>
+                                <td
+                                  className="data-cell fixed future-cell"
+                                  style={{
+                                    opacity: 0.5,
+                                    fontStyle: "italic",
+                                    fontWeight: "300",
+                                  }}
+                                >
+                                  &nbsp;
+                                </td>
+                                <td
+                                  className="data-cell fixed future-cell"
+                                  style={{
+                                    opacity: 0.5,
+                                    fontStyle: "italic",
+                                    fontWeight: "300",
+                                  }}
+                                >
+                                  &nbsp;
+                                </td>
+                              </>
+                            )}
+                            <td
+                              className="data-cell fixed future-cell"
+                              style={{
+                                opacity: 0.5,
+                                fontStyle: "italic",
+                                fontWeight: "300",
+                              }}
+                            >
+                              &nbsp;
+                            </td>
+                            {getFutureRow(tableData).map((cell, colIdx) => (
+                              <td
+                                key={colIdx}
+                                className={`data-cell ${cell.color} future-cell`}
+                                style={{
+                                  opacity: 0.5,
+                                  fontStyle: "italic",
+                                  pointerEvents: "none",
+                                  height: "50px",
+                                  fontWeight: "300",
+                                }}
+                              >
+                                {cell.value}
+                              </td>
+                            ))}
+                          </tr>
+                        )}
                     </tbody>
                   </table>
                 ) : (
