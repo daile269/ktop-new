@@ -969,13 +969,10 @@ function InputPage() {
                 className="toolbar-btn"
                 disabled
                 style={{
-                  fontSize: "20px",
+                  fontSize: "22px",
                   fontWeight: "bold",
-                  backgroundColor:
-                    import.meta.env.VITE_SITE_ID === "site_a"
-                      ? "#007bff"
-                      : "#6c757d",
-                  color: "white",
+                  backgroundColor: "#ffc107",
+                  color: "#000",
                   cursor: "default",
                   opacity: 1,
                   border: "none",
@@ -984,7 +981,7 @@ function InputPage() {
                   marginRight: "10px",
                 }}
               >
-                Bảng thông - APP:{" "}
+                Bảng thông - APP {import.meta.env.VITE_APP_STT || ""}
                 {import.meta.env.VITE_SITE_ID === "site_a" ? "A" : "B"}
               </button>
               <label style={{ fontSize: "20px", fontWeight: "bold" }}>
@@ -1386,10 +1383,24 @@ function InputPage() {
             >
               ✅
             </div>
-            <h2 style={{ fontSize: "40px", fontWeight: "bold", marginBottom: "20px", color: "#000" }}>
+            <h2
+              style={{
+                fontSize: "40px",
+                fontWeight: "bold",
+                marginBottom: "20px",
+                color: "#000",
+              }}
+            >
               THÀNH CÔNG!
             </h2>
-            <p style={{ fontSize: "28px", fontWeight: "bold", marginBottom: "40px", color: "#000" }}>
+            <p
+              style={{
+                fontSize: "28px",
+                fontWeight: "bold",
+                marginBottom: "40px",
+                color: "#000",
+              }}
+            >
               Đã thêm dữ liệu vào bảng tính thành công.
             </p>
             <div

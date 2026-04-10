@@ -1632,13 +1632,10 @@ function App() {
               className="toolbar-button"
               disabled
               style={{
-                fontSize: "18px",
+                fontSize: "22px",
                 fontWeight: "bold",
-                backgroundColor:
-                  import.meta.env.VITE_SITE_ID === "site_a"
-                    ? "#007bff"
-                    : "#6c757d",
-                color: "white",
+                backgroundColor: "#ffc107",
+                color: "#000",
                 cursor: "default",
                 opacity: 1,
                 border: "none",
@@ -1647,7 +1644,7 @@ function App() {
                 marginRight: "10px",
               }}
             >
-              Bảng tính - APP:{" "}
+              Bảng tính - APP {import.meta.env.VITE_APP_STT || ""}
               {import.meta.env.VITE_SITE_ID === "site_a" ? "A" : "B"}
             </button>
             <button
