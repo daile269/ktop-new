@@ -282,7 +282,9 @@ function App() {
             for (let r = ROWS - 1; r >= 0; r--) {
               if (
                 !qdel?.[r] &&
-                (qd?.[r] !== "" && qd?.[r] !== undefined && qd?.[r] !== null)
+                qd?.[r] !== "" &&
+                qd?.[r] !== undefined &&
+                qd?.[r] !== null
               ) {
                 lastIdx = r;
                 break;
@@ -1994,11 +1996,8 @@ function App() {
                     </colgroup>
                     <thead>
                       <tr>
-                        <th colSpan="2" className="group-header">
+                        <th colSpan="3" className="group-header">
                           Q{pageId.replace("q", "")}
-                        </th>
-                        <th colSpan="1" className="group-header">
-                          TT từ BT
                         </th>
                         {tableIndex === 0 && (
                           <>
@@ -2014,7 +2013,7 @@ function App() {
                           Thông
                         </th>
                         <th colSpan="10" className="group-header">
-                          Q{pageId.replace("q", "")}- Tham số: áp suất
+                          Q{pageId.replace("q", "")} - Tham số: áp suất
                           nước-nhiệt độ- độ ph- tỷ phần sinh hóa- mùa- f sinh
                           học
                         </th>
@@ -2030,9 +2029,7 @@ function App() {
                         <th
                           className="col-header fixed"
                           style={{ minWidth: "150px", width: "150px" }}
-                        >
-                          STT D.T
-                        </th>
+                        ></th>
                         {tableIndex === 0 && (
                           <>
                             <th className="col-header fixed">A</th>
@@ -2231,86 +2228,86 @@ function App() {
                         });
                       })()}
 
-                        {/* Dòng tương lai (Dòng gợi ý) */}
-                        {tableData.length > 0 && (
-                          <tr className="future-row">
-                            <td
-                              className="data-cell fixed future-cell"
-                              style={{
-                                opacity: 0.5,
-                                fontStyle: "italic",
-                                height: "50px",
-                                fontWeight: "300",
-                              }}
-                            >
-                              &nbsp;
-                            </td>
-                            <td
-                              className="data-cell fixed future-cell"
-                              style={{
-                                opacity: 0.5,
-                                fontStyle: "italic",
-                                fontWeight: "300",
-                              }}
-                            >
-                              &nbsp;
-                            </td>
-                            <td
-                              className="data-cell fixed future-cell"
-                              style={{
-                                fontStyle: "italic",
-                                fontWeight: 600,
-                              }}
-                            >
-                              &nbsp;
-                            </td>
-                            {tableIndex === 0 && (
-                              <>
-                                <td
-                                  className="data-cell fixed future-cell"
-                                  style={{
-                                    fontStyle: "italic",
-                                    fontWeight: 600,
-                                  }}
-                                >
-                                  &nbsp;
-                                </td>
-                                <td
-                                  className="data-cell fixed future-cell"
-                                  style={{
-                                    fontStyle: "italic",
-                                    fontWeight: 600,
-                                  }}
-                                >
-                                  &nbsp;
-                                </td>
-                              </>
-                            )}
-                            <td
-                              className="data-cell fixed future-cell"
-                              style={{
-                                fontStyle: "italic",
-                                fontWeight: 600,
-                              }}
-                            >
-                              &nbsp;
-                            </td>
-                            {getFutureRow(tableData).map((cell, colIdx) => (
+                      {/* Dòng tương lai (Dòng gợi ý) */}
+                      {tableData.length > 0 && (
+                        <tr className="future-row">
+                          <td
+                            className="data-cell fixed future-cell"
+                            style={{
+                              opacity: 0.5,
+                              fontStyle: "italic",
+                              height: "50px",
+                              fontWeight: "300",
+                            }}
+                          >
+                            &nbsp;
+                          </td>
+                          <td
+                            className="data-cell fixed future-cell"
+                            style={{
+                              opacity: 0.5,
+                              fontStyle: "italic",
+                              fontWeight: "300",
+                            }}
+                          >
+                            &nbsp;
+                          </td>
+                          <td
+                            className="data-cell fixed future-cell"
+                            style={{
+                              fontStyle: "italic",
+                              fontWeight: 600,
+                            }}
+                          >
+                            &nbsp;
+                          </td>
+                          {tableIndex === 0 && (
+                            <>
                               <td
-                                key={colIdx}
-                                className={`data-cell ${cell.color} future-cell`}
+                                className="data-cell fixed future-cell"
                                 style={{
-                                  pointerEvents: "none",
-                                  height: "50px",
                                   fontStyle: "italic",
                                   fontWeight: 600,
                                 }}
                               >
-                                {cell.value}
+                                &nbsp;
                               </td>
-                            ))}
-                          </tr>
-                        )}
+                              <td
+                                className="data-cell fixed future-cell"
+                                style={{
+                                  fontStyle: "italic",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                &nbsp;
+                              </td>
+                            </>
+                          )}
+                          <td
+                            className="data-cell fixed future-cell"
+                            style={{
+                              fontStyle: "italic",
+                              fontWeight: 600,
+                            }}
+                          >
+                            &nbsp;
+                          </td>
+                          {getFutureRow(tableData).map((cell, colIdx) => (
+                            <td
+                              key={colIdx}
+                              className={`data-cell ${cell.color} future-cell`}
+                              style={{
+                                pointerEvents: "none",
+                                height: "50px",
+                                fontStyle: "italic",
+                                fontWeight: 600,
+                              }}
+                            >
+                              {cell.value}
+                            </td>
+                          ))}
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 ) : (
@@ -2628,8 +2625,6 @@ function App() {
                   }}
                 />
               </div>
-
-
             </div>
 
             <div className="modal-footer">
