@@ -172,7 +172,9 @@ function App() {
 
         const tVal = tValues[row] !== "" ? parseInt(tValues[row]) : -1;
         const isRed = col === tVal && tVal !== -1;
-        const isPurple = y >= purpleRangeFrom && y <= purpleRangeTo;
+        const isPurple =
+          Number(y) >= Number(purpleRangeFrom) &&
+          Number(y) <= Number(purpleRangeTo);
         let color = "white";
 
         // LUÔN giữ logic tô màu đỏ (isRed)
@@ -224,7 +226,7 @@ function App() {
         newTValuesArr[i][r] = String((n1 + n2) % 10);
       }
       // skipColor = true for T3-T10 (i > 1)
-      newTableDataArr.push(generateTableDataArr(newTValuesArr[i], i > 1));
+      newTableDataArr.push(generateTableDataArr(newTValuesArr[i], false)); // Hiện báo màu ở tất cả các bảng
     }
     setAllTValues(newTValuesArr);
     setAllTableData(newTableDataArr);
@@ -275,10 +277,13 @@ function App() {
             purpleRangeFrom: pf,
             purpleRangeTo: pt,
           } = res.data;
-          if (pf && pt) {
+          if (pf !== undefined && pt !== undefined) {
             let lastIdx = -1;
             for (let r = ROWS - 1; r >= 0; r--) {
-              if (!qdel?.[r] && (qd?.[r] || qa?.[r] || qb?.[r])) {
+              if (
+                !qdel?.[r] &&
+                (qd?.[r] !== "" && qd?.[r] !== undefined && qd?.[r] !== null)
+              ) {
                 lastIdx = r;
                 break;
               }
@@ -299,7 +304,16 @@ function App() {
                   let y = 1;
                   for (let r = 0; r <= lastIdx; r++) {
                     if (qdel?.[r]) continue;
-                    if (r === lastIdx && y >= pf && y <= pt) {
+                    // Bỏ qua hàng rỗng giống generateTableDataArr
+                    if (!qd?.[r] && qa?.[r] === "" && qb?.[r] === "") {
+                      continue;
+                    }
+
+                    if (
+                      r === lastIdx &&
+                      Number(y) >= Number(pf) &&
+                      Number(y) <= Number(pt)
+                    ) {
                       hasP = true;
                       break;
                     }
@@ -457,7 +471,9 @@ function App() {
         nextY = isRed ? 1 : lastY + 1;
       }
 
-      const isPurple = nextY >= purpleRangeFrom && nextY <= purpleRangeTo;
+      const isPurple =
+        Number(nextY) >= Number(purpleRangeFrom) &&
+        Number(nextY) <= Number(purpleRangeTo);
       const color = isPurple ? "purple" : "white";
       futureRow.push({ value: `${col}-${nextY}`, color: color });
     }
@@ -531,7 +547,8 @@ function App() {
 
         // Kiểm tra xem có nằm trong purple range không
         const isPurple =
-          currentY >= purpleRangeFrom && currentY <= purpleRangeTo;
+          Number(currentY) >= Number(purpleRangeFrom) &&
+          Number(currentY) <= Number(purpleRangeTo);
 
         // Xác định màu cuối cùng
         if (!skipColor) {
