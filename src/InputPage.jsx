@@ -752,7 +752,7 @@ function InputPage() {
         selectedIndices.forEach((idx) => {
           activeA.push(allQData[i - 1].aValues[idx] || "");
           activeB.push(allQData[i - 1].bValues[idx] || "");
-          activeZ.push(zValues[idx] || "");
+          activeZ.push(""); // Không chép cột Z sang bảng tính
           activeD.push(transferDate);
           activeDel.push(false);
           activeSourceSTT.push(String(idx).padStart(3, "0"));

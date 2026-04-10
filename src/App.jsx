@@ -891,7 +891,7 @@ function App() {
     newDateValues[newRowIndex] = newRowDate;
     newAValues[newRowIndex] = newRowT1; // Giờ là A
     newBValues[newRowIndex] = newRowT2; // Giờ là B
-    newZValues[newRowIndex] = newRowZ;
+    newZValues[newRowIndex] = ""; // Không dùng Z nữa
     newDeletedRows[newRowIndex] = false;
 
     setDateValues(newDateValues);
@@ -912,7 +912,7 @@ function App() {
         const qZ = [...(result.data.zValues || [])];
         qA[newRowIndex] = newRowT1;
         qB[newRowIndex] = newRowT2;
-        qZ[newRowIndex] = newRowZ.slice(0, 10);
+        qZ[newRowIndex] = "";
 
         syncPromises.push(
           savePageData(
@@ -1942,7 +1942,6 @@ function App() {
                   <table className="data-grid">
                     <colgroup>
                       <col style={{ width: "80px" }} /> {/* STT */}
-                      <col style={{ width: "150px" }} /> {/* Z */}
                       <col style={{ width: "190px" }} /> {/* Ngày */}
                       <col style={{ width: "150px" }} /> {/* STT D.T */}
                       {tableIndex === 0 && (
@@ -1958,7 +1957,7 @@ function App() {
                     </colgroup>
                     <thead>
                       <tr>
-                        <th colSpan="3" className="group-header">
+                        <th colSpan="2" className="group-header">
                           Q{pageId.replace("q", "")}
                         </th>
                         <th colSpan="1" className="group-header">
@@ -1985,12 +1984,6 @@ function App() {
                       </tr>
                       <tr>
                         <th className="col-header fixed">STT</th>
-                        <th
-                          className="col-header fixed"
-                          style={{ minWidth: "150px", width: "150px" }}
-                        >
-                          Z
-                        </th>
                         <th
                           className="col-header fixed date-col-header"
                           style={{ minWidth: "190px", width: "190px" }}
@@ -2029,57 +2022,6 @@ function App() {
                             <tr key={rowIndex}>
                               <td className="data-cell fixed">
                                 {String(displayRowNumber).padStart(3, "0")}
-                              </td>
-                              <td
-                                className="data-cell fixed"
-                                style={{ minWidth: "150px", width: "150px" }}
-                              >
-                                <input
-                                  type="text"
-                                  className="grid-input"
-                                  value={zValues[rowIndex] || ""}
-                                  onChange={async (e) => {
-                                    const val = e.target.value;
-                                    if (val.length > 10) return;
-
-                                    const newZValues = [...zValues];
-                                    newZValues[rowIndex] = val;
-                                    setZValues(newZValues);
-
-                                    // Sync sang tất cả Q1-Q10
-                                    const syncPromises = [];
-                                    for (let i = 1; i <= 10; i++) {
-                                      const qId = `q${i}`;
-                                      const result = await loadPageData(qId);
-                                      if (result.success && result.data) {
-                                        syncPromises.push(
-                                          savePageData(
-                                            qId,
-                                            result.data.aValues,
-                                            result.data.bValues,
-                                            newZValues,
-                                            dateValues,
-                                            result.data.deletedRows || [],
-                                            sourceSTTValues,
-                                            purpleRangeFrom,
-                                            purpleRangeTo,
-                                            keepLastNRows,
-                                          ),
-                                        );
-                                      }
-                                    }
-                                    await Promise.all(syncPromises);
-                                  }}
-                                  style={{
-                                    width: "100%",
-                                    border: "none",
-                                    background: "transparent",
-                                    fontSize: "22px",
-                                    textAlign: "center",
-                                    fontWeight: "bold",
-                                    color: "#333",
-                                  }}
-                                />
                               </td>
                               <td className="data-cell fixed date-col">
                                 <input
@@ -2279,19 +2221,8 @@ function App() {
                             <td
                               className="data-cell fixed future-cell"
                               style={{
-                                opacity: 0.5,
                                 fontStyle: "italic",
-                                fontWeight: "300",
-                              }}
-                            >
-                              &nbsp;
-                            </td>
-                            <td
-                              className="data-cell fixed future-cell"
-                              style={{
-                                opacity: 0.5,
-                                fontStyle: "italic",
-                                fontWeight: "300",
+                                fontWeight: 600,
                               }}
                             >
                               &nbsp;
@@ -2301,9 +2232,8 @@ function App() {
                                 <td
                                   className="data-cell fixed future-cell"
                                   style={{
-                                    opacity: 0.5,
                                     fontStyle: "italic",
-                                    fontWeight: "300",
+                                    fontWeight: 600,
                                   }}
                                 >
                                   &nbsp;
@@ -2311,9 +2241,8 @@ function App() {
                                 <td
                                   className="data-cell fixed future-cell"
                                   style={{
-                                    opacity: 0.5,
                                     fontStyle: "italic",
-                                    fontWeight: "300",
+                                    fontWeight: 600,
                                   }}
                                 >
                                   &nbsp;
@@ -2323,9 +2252,8 @@ function App() {
                             <td
                               className="data-cell fixed future-cell"
                               style={{
-                                opacity: 0.5,
                                 fontStyle: "italic",
-                                fontWeight: "300",
+                                fontWeight: 600,
                               }}
                             >
                               &nbsp;
@@ -2335,11 +2263,10 @@ function App() {
                                 key={colIdx}
                                 className={`data-cell ${cell.color} future-cell`}
                                 style={{
-                                  opacity: 0.5,
-                                  fontStyle: "italic",
                                   pointerEvents: "none",
                                   height: "50px",
-                                  fontWeight: "300",
+                                  fontStyle: "italic",
+                                  fontWeight: 600,
                                 }}
                               >
                                 {cell.value}
@@ -2665,32 +2592,7 @@ function App() {
                 />
               </div>
 
-              <div className="form-group" style={{ marginTop: "20px" }}>
-                <label
-                  style={{
-                    fontSize: "18px",
-                    fontWeight: "bold",
-                    marginBottom: "8px",
-                    display: "block",
-                  }}
-                >
-                  Z (không bắt buộc):
-                </label>
-                <input
-                  type="text"
-                  maxLength={10}
-                  value={newRowZ}
-                  onChange={(e) => setNewRowZ(e.target.value)}
-                  placeholder="Nhập Z (tối đa 10 ký tự)"
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    fontSize: "18px",
-                    border: "2px solid #ddd",
-                    borderRadius: "6px",
-                  }}
-                />
-              </div>
+
             </div>
 
             <div className="modal-footer">
