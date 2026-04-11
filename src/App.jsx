@@ -335,7 +335,7 @@ function App() {
     loadAllInfo();
   }, [purpleRangeFrom, purpleRangeTo]);
 
-  if (pathname === "input" || !pathname) {
+  if (pathname === "input") {
     return <InputPage />;
   }
 
