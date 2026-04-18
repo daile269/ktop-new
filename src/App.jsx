@@ -2113,7 +2113,7 @@ function App() {
                                     width: "100%",
                                     border: "none",
                                     background: "transparent",
-                                    fontSize: "22px",
+                                    fontSize: "35px",
                                     textAlign: "center",
                                     fontWeight: "bold",
                                     color: "#6f42c1",
