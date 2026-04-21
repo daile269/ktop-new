@@ -22,6 +22,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
+  const [pageLabel, setPageLabel] = useState("");
 
   const [aValues, setAValues] = useState(Array(126).fill(""));
   const [bValues, setBValues] = useState(Array(126).fill(""));
@@ -114,6 +115,7 @@ function App() {
             result.data.sourceSTTValues || Array(ROWS).fill(""),
           );
           setDeletedRows(result.data.deletedRows || Array(ROWS).fill(false));
+          setPageLabel(result.data.pageLabel || "");
 
           const q1Result = await loadPageData("q1");
           let loadedPurpleFrom = 0;
@@ -674,6 +676,8 @@ function App() {
         purpleRangeFrom,
         purpleRangeTo,
         keepLastNRows,
+        undefined,
+        pageLabel,
       );
 
       if (result.success) {
@@ -696,6 +700,8 @@ function App() {
                   purpleRangeFrom, // ⭐ Sync purple range
                   purpleRangeTo, // ⭐ Sync purple range
                   keepLastNRows,
+                  undefined,
+                  qResult.data.pageLabel || "", // Keep the other page's label
                 ),
               );
             }
@@ -729,6 +735,8 @@ function App() {
       purpleRangeFrom,
       purpleRangeTo,
       keepLastNRows,
+      undefined,
+      pageLabel,
     );
 
     if (result.success) {
@@ -753,6 +761,8 @@ function App() {
                 purpleRangeFrom, // ⭐ Sync purple range từ Q hiện tại
                 purpleRangeTo, // ⭐ Sync purple range từ Q hiện tại
                 keepLastNRows,
+                undefined,
+                qResult.data.pageLabel || "", // Keep existing label
               ),
             );
           }
@@ -1995,6 +2005,22 @@ function App() {
                       <tr>
                         <th colSpan="3" className="group-header">
                           Q{pageId.replace("q", "")}
+                          <input
+                            type="text"
+                            value={pageLabel}
+                            onChange={(e) => setPageLabel(e.target.value)}
+                            placeholder="Ghi chú..."
+                            className="header-label-input"
+                            style={{
+                              marginLeft: "15px",
+                              fontSize: "22px",
+                              width: "300px",
+                              backgroundColor: "rgba(255, 255, 255, 0.5)",
+                              border: "1px solid #ddd",
+                              padding: "4px 10px",
+                              borderRadius: "6px"
+                            }}
+                          />
                         </th>
                         {tableIndex === 0 && (
                           <>
@@ -2010,9 +2036,9 @@ function App() {
                           Thông
                         </th>
                         <th colSpan="10" className="group-header">
-                          Q{pageId.replace("q", "")} - Tham số: áp suất
-                          nước-nhiệt độ- độ ph- tỷ phần sinh hóa- mùa- f sinh
-                          học
+                          Q{pageId.replace("q", "")} - Tham số: áp
+                          suất nước-nhiệt độ- độ ph- tỷ phần sinh hóa- mùa- f
+                          sinh học
                         </th>
                       </tr>
                       <tr>

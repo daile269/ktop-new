@@ -310,6 +310,26 @@ body {
   z-index: 11;
 }
 
+.header-label-input {
+  transition: all 0.3s ease;
+  outline: none;
+  font-family: inherit;
+  color: #cf3535ff;
+  border-bottom: 2px solid transparent !important;
+}
+
+.header-label-input:focus {
+  background-color: #fff !important;
+  border-bottom: 2px solid #cf3535ff !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-label-input::placeholder {
+  color: #aaa;
+  font-weight: normal;
+  font-style: italic;
+}
+
 .col-header {
   background: #fafafa !important;
   border: 2px solid #333;

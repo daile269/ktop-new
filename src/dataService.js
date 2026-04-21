@@ -40,6 +40,7 @@ export const savePageData = async (
   purpleRangeTo = 0,
   keepLastNRows = 126,
   allQData = undefined,
+  pageLabel = "",
 ) => {
   try {
     const realId = getRealPageId(pageId);
@@ -60,6 +61,7 @@ export const savePageData = async (
         purpleRangeTo,
         keepLastNRows,
         allQData,
+        pageLabel,
       }),
     });
 
@@ -130,6 +132,7 @@ export const loadPageData = async (pageId) => {
           purpleRangeTo: data.purpleRangeTo || 0,
           keepLastNRows: data.keepLastNRows || 126,
           allQData: data.allQData,
+          pageLabel: data.pageLabel || "",
         },
       };
     } else {
