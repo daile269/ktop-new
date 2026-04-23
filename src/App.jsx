@@ -1654,7 +1654,8 @@ function App() {
                 marginRight: "10px",
               }}
             >
-              Bảng tính - APP Phần mềm chung
+              Bảng tính - APP {import.meta.env.VITE_APP_STT || ""}
+              {import.meta.env.VITE_SITE_ID === "site_a" ? "A" : "B"}
             </button>
             <button
               onClick={() => setShowDeleteModal(true)}

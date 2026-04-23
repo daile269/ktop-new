@@ -981,7 +981,8 @@ function InputPage() {
                   marginRight: "10px",
                 }}
               >
-                Bảng thông - APP Phần mềm chung
+                Bảng thông - APP {import.meta.env.VITE_APP_STT || ""}
+                {import.meta.env.VITE_SITE_ID === "site_a" ? "A" : "B"}
               </button>
               <label style={{ fontSize: "20px", fontWeight: "bold" }}>
                 📊 Dòng tồn tại:
