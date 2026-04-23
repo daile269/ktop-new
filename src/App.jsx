@@ -1654,8 +1654,7 @@ function App() {
                 marginRight: "10px",
               }}
             >
-              Bảng tính - APP {import.meta.env.VITE_APP_STT || ""}
-              {import.meta.env.VITE_SITE_ID === "site_a" ? "A" : "B"}
+              Bảng tính - APP Phần mềm chung
             </button>
             <button
               onClick={() => setShowDeleteModal(true)}
@@ -2018,7 +2017,7 @@ function App() {
                               backgroundColor: "rgba(255, 255, 255, 0.5)",
                               border: "1px solid #ddd",
                               padding: "4px 10px",
-                              borderRadius: "6px"
+                              borderRadius: "6px",
                             }}
                           />
                         </th>
@@ -2036,9 +2035,9 @@ function App() {
                           Thông
                         </th>
                         <th colSpan="10" className="group-header">
-                          Q{pageId.replace("q", "")} - Tham số: áp
-                          suất nước-nhiệt độ- độ ph- tỷ phần sinh hóa- mùa- f
-                          sinh học
+                          Q{pageId.replace("q", "")} - Tham số: áp suất
+                          nước-nhiệt độ- độ ph- tỷ phần sinh hóa- mùa- f sinh
+                          học
                         </th>
                       </tr>
                       <tr>
